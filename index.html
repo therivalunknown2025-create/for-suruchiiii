@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>For My Love</title>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600&family=Poppins:wght@300;400;600&family=Tiro+Devanagari+Hindi&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-pink: #ff4d6d;
+            --deep-red: #800f2f;
+            --soft-rose: #fff0f3;
+            --gold: #d4af37;
+            --handwriting: 'Dancing Script', cursive;
+            --hindi-font: 'Tiro Devanagari Hindi', serif;
+        }
+
+        * { box-sizing: border-box; transition: all 0.3s ease; }
+
+        body {
+            margin: 0;
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--soft-rose);
+            color: var(--deep-red);
+            overflow-x: hidden;
+        }
+
+        /* --- 4) Password Protection Theme --- */
+        #password-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(45deg, #ff4d6d, #ff758f);
+            display: flex; justify-content: center; align-items: center;
+            z-index: 2000;
+        }
+
+        .pass-card {
+            background: white;
+            padding: 3rem;
+            border-radius: 30px;
+            text-align: center;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+            border: 5px solid var(--soft-rose);
+        }
+
+        .pass-card input {
+            padding: 12px;
+            border: 2px solid var(--primary-pink);
+            border-radius: 15px;
+            width: 100%;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        /* --- Navigation --- */
+        nav {
+            background: white;
+            padding: 1rem;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        .nav-btn {
+            background: none;
+            border: 2px solid var(--primary-pink);
+            color: var(--primary-pink);
+            padding: 8px 18px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .nav-btn.active, .nav-btn:hover {
+            background: var(--primary-pink);
+            color: white;
+            transform: scale(1.05);
+        }
+
+        .container { padding: 20px; max-width: 1200px; margin: auto; }
+        .tab-content { display: none; min-height: 80vh; }
+        .tab-content.active { display: block; animation: fadeIn 0.8s ease; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* --- 3) Home Tab: Polaroid Gallery --- */
+        .polaroid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            padding: 40px 0;
+        }
+
+        .polaroid {
+            background: white;
+            padding: 15px 15px 60px 15px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+            cursor: pointer;
+            position: relative;
+        }
+
+        .polaroid img { width: 100%; height: 250px; object-fit: cover; }
+        .polaroid:nth-child(odd) { transform: rotate(-3deg); }
+        .polaroid:nth-child(even) { transform: rotate(3deg); }
+        .polaroid:hover { transform: rotate(0deg) scale(1.05); z-index: 10; }
+
+        /* Modal for Polaroid Zoom */
+        #photo-modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.9);
+            z-index: 3000;
+            justify-content: center; align-items: center;
+            flex-direction: column;
+            cursor: pointer;
+        }
+
+        #modal-img { max-width: 80%; max-height: 70%; border: 15px solid white; box-shadow: 0 0 30px rgba(255,255,255,0.2); }
+        #modal-note { color: white; font-family: var(--handwriting); font-size: 2.5rem; margin-top: 20px; text-align: center; padding: 0 20px;}
+
+        /* --- 5) Birthday Tab: Sticky Notes --- */
+        .timer-box {
+            text-align: center;
+            background: white;
+            padding: 20px;
+            border-radius: 20px;
+            margin-bottom: 30px;
+            border: 2px dashed var(--primary-pink);
+        }
+
+        .countdown { display: flex; justify-content: center; gap: 20px; font-weight: bold; font-size: 1.5rem; }
+
+        /* --- 5) Birthday Tab: Animated Sticky Notes --- */
+.sticky-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 20px;
+    perspective: 1000px; /* Required for 3D flip */
+}
+
+.sticky-note {
+    background: #ffeb3b;
+    padding: 20px;
+    aspect-ratio: 1/1;
+    box-shadow: 5px 5px 15px rgba(0,0,0,0.2);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    font-family: var(--handwriting);
+    font-size: 1.3rem;
+    cursor: pointer;
+    position: relative;
+    transform-style: preserve-3d;
+    transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s;
+}
+
+/* Hover effect to make it feel interactive */
+.sticky-note:hover {
+    transform: translateY(-10px) rotate(2deg);
+    box-shadow: 10px 10px 20px rgba(0,0,0,0.15);
+}
+
+/* 2nd Feb Animation: Heartbeat Pulse */
+@keyframes heartbeat {
+    0% { transform: scale(1); }
+    25% { transform: scale(1.1); }
+    40% { transform: scale(1); }
+    60% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+}
+
+.heart-pulse {
+    animation: heartbeat 0.8s ease-in-out;
+}
+
+/* Flip Animation when clicked */
+.note-flip {
+    transform: rotateY(180deg) scale(1.1);
+    background: #ff758f !important;
+    color: white !important;
+}
+
+.locked-note {
+    background: #e0e0e0 !important;
+    opacity: 0.7;
+    cursor: not-allowed !important;
+}
+
+.locked-note:hover {
+    transform: none;
+}
+        /* --- 7) Importance Tab --- */
+        #importance {
+            background: linear-gradient(rgba(255, 240, 243, 0.85), rgba(255, 240, 243, 0.85)), url('bg-importance.jpg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            padding: 50px;
+            border-radius: 20px;
+            line-height: 1.8;
+            font-size: 1.2rem;
+        }
+
+        /* --- 8) Love Letter Tab --- */
+        .letter-envelope {
+            max-width: 600px;
+            margin: 50px auto;
+            background: #fff;
+            padding: 40px;
+            border-radius: 5px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            font-family: var(--handwriting);
+            font-size: 1.5rem;
+            position: relative;
+            border-left: 5px solid var(--primary-pink);
+        }
+
+        /* --- 9) Kavita Section --- */
+        .kavita-card {
+            background: #fdf6e3;
+            border: 2px solid #b58900;
+            margin-bottom: 20px;
+            padding: 20px;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+
+        .kavita-content {
+            display: none;
+            font-family: var(--hindi-font);
+            font-size: 1.3rem;
+            padding-top: 15px;
+            white-space: pre-line;
+            color: #586e75;
+        }
+
+        /* --- Universal Buttons --- */
+        .action-btn {
+            background: var(--primary-pink);
+            color: white;
+            border: none;
+            padding: 10px 25px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+         /* --- 6) Anniversary Surprise Styling --- */
+#anniversary-overlay {
+    display: none;
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.8);
+    z-index: 4000;
+    justify-content: center;
+    align-items: center;
+}
+
+.anniversary-letter {
+    background: #fffafa;
+    width: 90%;
+    max-width: 500px;
+    padding: 40px;
+    border-radius: 15px;
+    position: relative;
+    box-shadow: 0 0 50px var(--primary-pink);
+    border: 2px solid var(--gold);
+    transform: translateY(100vh);
+    transition: transform 1s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    font-family: var(--handwriting);
+    text-align: center;
+}
+
+.anniversary-letter.slide-up {
+    transform: translateY(0);
+}
+
+.heart-seal {
+    font-size: 3rem;
+    color: var(--vibrant-red);
+    cursor: pointer;
+    margin-bottom: 20px;
+    display: inline-block;
+    animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.2); }
+    100% { transform: scale(1); }
+}
+
+.anniversary-text {
+    font-size: 1.6rem;
+    color: #444;
+    line-height: 1.4;
+    display: none; /* Hidden until seal is clicked */
+}  
+
+
+
+    </style>
+</head>
+<body>
+
+    <div id="password-overlay">
+        <div class="pass-card">
+            <h2 style="color: var(--primary-pink); margin-bottom: 20px;">For Your Eyes Only ❤️</h2>
+            <input type="password" id="pass-input" placeholder="What do I call you?">
+            <button class="action-btn" onclick="checkPassword()">Unlock Website</button>
+        </div>
+    </div>
+
+    <nav>
+        <button class="nav-btn active" onclick="showTab('home', this)">Home</button>
+        <button class="nav-btn" onclick="showTab('birthday', this)">Birthday</button>
+        <button class="nav-btn" onclick="showTab('anniversary', this)">Anniversary</button>
+        <button class="nav-btn" onclick="showTab('importance', this)">Importance</button>
+        <button class="nav-btn" onclick="showTab('letter', this)">Love Letter</button>
+        <button class="nav-btn" onclick="showTab('kavita', this)">Hindi Kavita</button>
+    </nav>
+
+    <div class="container">
+        
+        <section id="home" class="tab-content active">
+            <h1 style="text-align: center; font-family: var(--handwriting); font-size: 3rem;">Hi Suruchi...</h1>
+            <div class="polaroid-container">
+                <div class="polaroid" onclick="zoomPhoto('p1.jpeg', 'Ye jo tumhari random photos mere pass hai inko bus dekhte rehne se mujhe bhut acha lagta hai.')">
+                    <img src="p1.jpeg" alt="Memory 1">
+                    <p style="text-align: center; font-family: var(--handwriting);">Meri jaan</p>
+                </div>
+                <div class="polaroid" onclick="zoomPhoto('p6.jpeg', 'Meri cutieee , tumhari pyaari awaaz sunte rehna aur tumhare expressions dekhna is my favourtie part of the video calls we have.')">
+                    <img src="p6.jpeg" alt="Memory 2">
+                    <p style="text-align: center; font-family: var(--handwriting);">Meri cutiee</p>
+                </div>
+                <div class="polaroid" onclick="zoomPhoto('p5.jpeg', 'Tumhare saath time spend karna ,,, mera bus chale to 24 ghante saaath rahu tumhare.')">
+                    <img src="p5.jpeg" alt="Memory 3">
+                    <p style="text-align: center; font-family: var(--handwriting);">Always want to be with you</p>
+                </div>
+                <div class="polaroid" onclick="zoomPhoto('p2.jpeg', 'infinite love for you.')">
+                    <img src="p2.jpeg" alt="Memory 4">
+                    <p style="text-align: center; font-family: var(--handwriting);">Humesha tumhara</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="birthday" class="tab-content">
+            <div class="timer-box">
+                <h2>Countdown to your 21st Birthday!</h2>
+                <div id="bday-timer" class="countdown"></div>
+            </div>
+            <div class="sticky-grid" id="birthday-notes">
+                </div>
+        </section>
+  <section id="anniversary" class="tab-content">
+    <div class="timer-box">
+        <h2 style="font-family: var(--handwriting); font-size: 2.5rem;">Our 2-Month Journey</h2>
+        <div id="ann-timer" class="countdown"></div>
+    </div>
+    
+    <div style="text-align: center;">
+        <p>A special memory is waiting for you...</p>
+        <button class="action-btn" onclick="openAnniversaryLetter()">
+            💖 Open Anniversary Note
+        </button>
+    </div>
+
+    <div id="anniversary-overlay" onclick="closeAnniversary()">
+        <div class="anniversary-letter" id="ann-card" onclick="event.stopPropagation()">
+            <div class="heart-seal" id="seal" onclick="breakSeal()">❤️</div>
+            <div class="anniversary-text" id="ann-msg">
+                <h3>Happy 2 Months, Cutieeeeeeee meriiiiii !</h3>
+                <p>Ye jo 2 mahine maine tumhare saath , tumhare pass aur tumse baat karte hue nikaale hai wo 2 mahine meri zindagi ke sabse pyaare ache the , mai aise hi tumahre saath 2 saal aur phir 20 saal aur phir 200 saal saath rehna chahta hu humesha humesha , tumhe apna banana chahta hu .... i lovee you cutiee suruchiiii , thankiiuuuuu for being into my life.</p>
+                <p>My happiness star . ✨</p>
+                <button class="nav-btn" onclick="closeAnniversary()">Close</button>
+            </div>
+        </div>
+    </div>
+</section>
+
+               <section id="importance" class="tab-content">
+            <h2 style="text-align: center; text-decoration: underline;">Why You Are Important To Me</h2>
+            <p>
+                [Cutiee,you know that you are very important in my Life but i want you to know why is it so <br> i never had much female interactions in my life , i was unaware with the feeling of getting attached or to love someone untill on a sudden day i just observed you , i was not stalking btw :), i just felt something in my heart (people say it butterfly effect) and for the first time i felt like that i am feeling that affection and attraction for somebody , at that time i did not know that this attraction or affection will convert into such strong feel of love and obsession that i feel today , my life can be described in two phase , one before you and the other after you , before you i used to feel "ek ladki ke liye kaun hi itna paagal hota hai" and i used to feel that over obsession for any person , my life was a bit lonely , i dont had somebody to share my feelings with , my day routine with , someone who can make me feel loved but after you things changed , i am over obsessed with you , your existence makes me feel overwhelmed and blessed , when i ask you "Suruchi kiski hai?" and you reply with "Kartikay ki", you dont know you make me feel so much happy and so much blessed and the feeling that you are mine is enough to make me smile all day. Just the mere thaught of loosing you scares the shit out of me because i can't live without you , your chats , your snaps , your cute warnings , mujhe kabhi nhi laga tha ki koi mujhe gadha bolega yaa kutta bolega aur mujhe itna acha lagegaa , literally mujhe tumhara mujhe gadha yaa kutta kehna bhut cute lagta hai bhut jyada cute hadd se jyada cute , tumhari bhut importance hai meri life mai, mere stress ko meri anxiety ko sirf tum apni baato se gayab kar deti ho areey baaat bhi choro sirf tumhare naam ki notification mujhe relief deti hai mujhe, tumhara message dekh ke din ki shuruaat tumhare meessage se din ka end , tum meri aadat sii ban chuki ho, tumne meri life mai brightness full kar diii haii aur tumhara mere liye wo efforts jo tum karti ho , mera wo pyaara saa portrait jo tumne banaya , mere liye ek pyaara saa muflar laayi , mere ko wo siwai khilai (best sewai i ever had in my life ) tum bhut perfect ho yaar tumhe pata nhi hai lekin tum ho aur utni hi pyaari ho, mujhe nhi fark padhta log kya kehte hai mai to tumhare vash mai hu ab puri tareeke se aur i hope ki mere life aur tumhari life alag alag naa ho wo humari life ho jisko hum khul ke enjoy kare aur ek saath bahut saari memories banaye ,,,,, i lovee youuu myyyy pyaari siiii cutieeee suruchiiiiiiiiiiiiiiiiii , in every birth i want to be with my suruchi , in every breathe i want to remember you , and in every situation i just want to hug you and kiss you ......thank you for every smile,every gift,every effort,and all those things which you do and make me happy...so  blessed to have you  😘😘😘😘🫂🫂🫂🫂  .
+.]
+                <br><br>
+                You are not my girlfreind , you are myyyy wifee , we are married in my head , i lovee youuuuu😘😘😘😘
+            </p>
+        </section>
+
+        <section id="letter" class="tab-content">
+            <div class="letter-envelope">
+                <p>My Dearest Suruchi,</p>
+                <p>i promise you the infinite love that a human being can express for any other human being.<br>
+i can't promise you the stars but sure can promise the brightness and the positivity that comes with stars.<br>
+i promise you to be with you when even when you dont want me to be with you.<br>
+i promise you that i will hug you and kiss your forehead whenever you feel that you are not loved enough in this world.<br>
+i promise you that i will not look up to any other female , the way i look up to you.<br>
+i promise you that you i will never let you down. <br>
+i promise you that i will never say anything or do anything that hurts you or your emotions.<br>
+i promise you that i will respect your dignity, your personality,your views and you as an human being or my human being.<br>
+People say the age of 20 is too less for a promise of  life together , but i promise you that for my whole life i will love you and i will be with you till my last breathe.<br>
+i promise you to never judge you for your words or your actions.<br>
+i promise you to  keep your secrets with me forever.<br>
+i promise to fulfill all your wishes, to be with you in every ambition you have for your life , to support you in every decision,i will be the first one in the crowd of millions to clap for you , i will be there for you in every phase of life you go through.<br>
+And i vow in the name of god , that i only want suruchi verma as my life partner , no one else ..........because i love suruchi as she is , i dont want to changer suruchi , she is perfect as she is and i want her to be like this only forever and love her the way she wants.<br>
+ Forever yours ❤️ 
+</p>
+                <p>Yours Forever,<br> Kartikay </p>
+            </div>
+        </section>
+
+        <section id="kavita" class="tab-content">
+            <h2 style="text-align: center; font-family: var(--hindi-font);">कविता संग्रह</h2>
+            <div id="kavita-list">
+                <div class="kavita-card" onclick="toggleKavita(this)">
+                    <h3>१. पंजाबी पसंद है ना तेनू (Click to Read)</h3>
+                    <div class="kavita-content">ऐना बन ठन के
+तुसी कित्थे चले ओ
+माथे ते बिंदी ला के
+हथां च चूड़ी पा के
+तुसी कित्थे चले ओ
+छम छम पैरां दी पायल
+करदी साड्डा दिल घायल
+सानु घायल करके क़ातिल
+तुसी कित्थे चले ओ,<br>।</div>
+                </div>
+                <div class="kavita-card" onclick="toggleKavita(this)">
+                    <h3>२. आकर्षण</h3>
+                    <div class="kavita-content">तुम्हारे केस गोयल से काले हैं,
+हमें आकर्षित करने वाले हैं।
+
+तुम्हारे नैन सागर से गहरे हैं,
+मेरे हृदय पर इनके पहरे हैं।
+
+तुम्हारी मुस्कान तो इतनी चंचल है,
+जैसे रेत में पड़ा कहीं जल है।
+
+तुम्हारे मुख पर एक ऐसी आभा है,
+जिससे हो सकता जगत में उजाला हो।
+
+विरले ही जगत में मुख ऐसे,
+समक्ष जिनके चंद्र ने शस्त्र को डाला हों।
+
+तुम्हारी सुंदरता का क्या बखान करूं,
+मन करे कि विस्तृत व्याख्यान करूं।
+
+हा तुम हो अति सुंदर नारी,
+तुम्हारी सुंदरता रत्नों से प्यारी।
+
+तुम रात पूर्णिमा की हो प्रिये,
+जो प्रेमी के मन को लुभाता है।
+
+एक बार तुम्हारा दर्शन हो जिसे,
+आमरण सुंदरता का बखान करें।
+
+मन हो कि बड़ा करे कुछ वह,
+इस पर विस्तृत व्याख्यान करें।
+
+हां तुम्हारी सुंदरता अति सुंदर है,
+मानो यौवन का समंदर है।,<br>--सार्थक</div>
+   <h3></h3>
+                    <div class="kavita-content">
+
+                </div>
+                </div>
+        </section>
+
+    </div>
+
+    <div id="photo-modal" onclick="closeModal()">
+        <img id="modal-img" src="">
+        <div id="modal-note"></div>
+        <p style="color: grey; margin-top: 10px;">Click anywhere to close</p>
+    </div>
+
+    <script>
+        // 4) Password Protection
+        function checkPassword() {
+            const pass = document.getElementById('pass-input').value;
+            // SET YOUR PASSWORD HERE
+            if(pass.toLowerCase() === "Cutieee" || pass.toLowerCase() === "cutie") {
+                document.getElementById('password-overlay').style.display = 'none';
+            } else {
+                alert("Sahi password likhiye cutiee jii!");
+            }
+        }
+
+        // Navigation Tab Switching
+        function showTab(tabId, btn) {
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            btn.classList.add('active');
+        }
+
+        // 3) Home: Polaroid Modal
+        function zoomPhoto(imgSrc, note) {
+            document.getElementById('modal-img').src = imgSrc;
+            document.getElementById('modal-note').innerText = note;
+            document.getElementById('photo-modal').style.display = 'flex';
+        }
+        function closeModal() { document.getElementById('photo-modal').style.display = 'none'; }
+
+        // 5) & 6) Timers
+        function startTimer(dateStr, elementId) {
+            const target = new Date(dateStr).getTime();
+            setInterval(() => {
+                const now = new Date().getTime();
+                const diff = target - now;
+                
+                if(diff < 0) {
+                    document.getElementById(elementId).innerHTML = "THE DAY IS HERE! ❤️";
+                    return;
+                }
+
+                const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+                const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                const s = Math.floor((diff % (1000 * 60)) / 1000);
+
+                document.getElementById(elementId).innerHTML = `${d}d ${h}h ${m}m ${s}s`;
+            }, 1000);
+        }
+
+        startTimer("Feb 2, 2026 00:00:00", "bday-timer");
+        startTimer("Jan 23, 2026 00:00:00", "ann-timer");
+
+        // 5) Birthday Sticky Notes (21 Notes)
+      // 5) Birthday Sticky Notes (21 Notes)
+const notesGrid = document.getElementById('birthday-notes');
+
+// Check if it's Feb 2nd, 2026
+const today = new Date();
+const bdayDate = new Date("2026-02-02");
+const isBdayReached = today >= bdayDate;
+
+// Custom messages for your 21 notes
+const messages = ["i love the way you talk , i love the way you never want to hurt someone.",
+        "Tumse baat kar ke mujhe aisa lagta hai ki koi mera hai jo mujhe mere jaise pyaar karne ko taiyaar hai.",
+        "Mujhe abhi bhi yaad wo pehla instagram text jo tumne bheja tha aaj waha se yaha aana mere liye ek sapne jaisa hai ,thankiuu cutiee.",
+        "Tumhara tareeka jo hai achanak se muflar gift dena aur wo portrait , mujhe achanak se surprise kar dena.",
+        "Mere ko humesha reassurance dena ki mai tumhari hi huu ,thankiiiiuuuuu cutieee.",
+        "Tumhara mujhe gadha bolna aur kutta bolna uske liye bhi thankiuuu cutiee.",
+        "Mujhe humesha apna feel karane ke liye bhi thankiuuu cutieee.",
+        "Mere ulte seedhe sawalo ka jawab dene ke liyee bhiii thankiuuu cutieee.",
+        "Mujhe humesha confident feel karane ke liye bhi thankiuuu cutieeee.",
+        "Mujhe apni photos bhejne ke liye bhi thankiuuu cutieeee.",
+        "Mere se mere haal chaal puchte rehna aur mera khaana peena puchna meri care karne ke liye bhi thankiuu cutiee.",
+        "Tumhe pata hai mere papa ke baad ek tum ho jo mere man mai kya chal rha wo samjhne ki humesha koshish karti ho iske liye bhi thankiuuu cutieee.",
+        "Late night video calls , wo train mai bore naa hu uske liye video call inn sab ke liye bhi thankiiuuu cutiee.",
+        "Mera haath pakadne ke liye , mujhe hug karne ke liye bhi thankiuu cutieee.",
+        "Mujhe her baat batane ke liye aur apne cute expressions se mujhe pighalane ke liye bhi thankkiuuu cutieee.",
+        "Mujhe humesha tumhe haste hue aur strong dekhna hai , tumhari strenght banna hai mujhe weakness nhi.",
+        "Tum aur tumhari smile se jyada jarruri mere liye kuch nhi hai ye bhi yaad rakhna humesha.",
+        "Apni family ke liye bhi tum bahut badi strength ho aur tum unko proud feel karaogi,i totally believe you will do something great in your career.",
+        "Her wo mulakat her wo baat jo humne ki is how i got closer to you and is how i met the mother of my future kids.",
+        "Finally i want to say that i am here to build a future with you not to just spend time or fun chats , i am with you to be with you till the last breadth of my life and i am very practical and i manifest to be with you till the end of my life.",
+        "Happy 21st Birthday, my cutieee Suruchii!"
+    ];
+
+for(let i=1; i<=21; i++) {
+    const note = document.createElement('div');
+    note.className = 'sticky-note';
+    
+    if(!isBdayReached) {
+        note.classList.add('locked-note');
+        note.innerHTML = `<span>Note ${i}</span><br><small style="font-size:0.7rem">Unlocks Feb 2</small>`;
+        note.onclick = () => alert("Patience! This note will unlock on your birthday! ❤️");
+    } else {
+        note.innerHTML = `<span>Open Note ${i}</span>`;
+        
+        note.onclick = function() {
+            // Add heartbeat animation
+            this.classList.add('heart-pulse');
+            
+            // After heartbeat, flip and show message
+            setTimeout(() => {
+                this.classList.remove('heart-pulse');
+                this.classList.add('note-flip');
+                this.innerHTML = `<span style="transform: rotateY(180deg); display:inline-block;">${messages[i-1]}</span>`;
+            }, 800);
+        };
+    }
+    notesGrid.appendChild(note);
+}
+        
+
+     // 6) Anniversary Surprise Lock
+       function openAnniversaryLetter() {
+    const today = new Date();
+    // Month is 0-indexed, so 0 = January
+    const isAnniversary = (today.getMonth() === 0 && today.getDate() >= 23);
+
+    if (isAnniversary) {
+        const overlay = document.getElementById('anniversary-overlay');
+        const card = document.getElementById('ann-card');
+        
+        overlay.style.display = 'flex';
+        // Small timeout to allow display:flex to register before animating
+        setTimeout(() => {
+            card.classList.add('slide-up');
+        }, 10);
+    } else {
+        alert("Patience, my love! This note only opens on 23rd January. ❤️");
+    }
+}
+
+function breakSeal() {
+    const seal = document.getElementById('seal');
+    const msg = document.getElementById('ann-msg');
+    
+    seal.style.transform = "scale(5) rotate(45deg)";
+    seal.style.opacity = "0";
+    
+    setTimeout(() => {
+        seal.style.display = "none";
+        msg.style.display = "block";
+        msg.style.animation = "fadeIn 1s forwards";
+    }, 500);
+}
+
+function closeAnniversary() {
+    const overlay = document.getElementById('anniversary-overlay');
+    const card = document.getElementById('ann-card');
+    card.classList.remove('slide-up');
+    setTimeout(() => {
+        overlay.style.display = 'none';
+        // Reset the seal for next time
+        document.getElementById('seal').style.display = "inline-block";
+        document.getElementById('seal').style.opacity = "1";
+        document.getElementById('ann-msg').style.display = "none";
+    }, 500);
+}
+        // 9) Kavita Toggle
+        function toggleKavita(card) {
+            const content = card.querySelector('.kavita-content');
+            content.style.display = (content.style.display === 'block') ? 'none' : 'block';
+        }
+    </script>
+</body>
+</html>
